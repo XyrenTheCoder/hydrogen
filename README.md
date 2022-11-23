@@ -17,7 +17,7 @@ The bot is ready to use, but first, you need to install required modules.
 
 > discord 2.1.0 or above
 
-> flask 2.2.2
+> flask 2.2.2 or above
 
 <hr>
 

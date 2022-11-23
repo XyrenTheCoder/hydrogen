@@ -8,7 +8,10 @@ This is a Discord bot that was written in Python. <br>
 
 The bot is ready to use, but first, you need to install required modules.
 <hr>
+
 **Requirements**
+
+> Python 3.9
 
 > interactions
 
@@ -17,6 +20,7 @@ The bot is ready to use, but first, you need to install required modules.
 > flask
 
 > os
+
 <hr>
 
 After that, you need to put your bot's token inside `token.txt`. <br>

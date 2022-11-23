@@ -11,15 +11,13 @@ The bot is ready to use, but first, you need to install required modules.
 
 **Requirements**
 
-> Python 3.9
+> Python 3.8 or above
 
-> interactions
+> interactions 4.3.4 or above
 
-> discord
+> discord 2.1.0 or above
 
-> flask
-
-> os
+> flask 2.2.2
 
 <hr>
 

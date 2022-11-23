@@ -15,6 +15,8 @@ The bot is ready to use, but first, you need to have Python installed and instal
 
 > `discord.py` 2.1.0 or above
 
+> `asyncio` 3.4.3 or above
+
 > `flask` 2.2.2 or above
 
 <sub> (A little note here, what I'm using is: Python 3.9, interactions.py 4.3.4, discord.py 2.1.0, flask 2.2.2) <sub>

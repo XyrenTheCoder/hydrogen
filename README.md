@@ -4,7 +4,7 @@ This is a Discord bot that was written in Python.
 
 ## start setting up
 
-The bot is ready to use, but first, you need to install required modules.
+The bot is ready to use, but first, you need to have Python installed and install required modules.
 <hr>
 
 **Requirements**

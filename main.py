@@ -186,7 +186,7 @@ async def _3(ctx: interactions.CommandContext, member: interactions.Member, *, r
 @commands.guild_only()
 async def _4(ctx: interactions.CommandContext, id: str):
     await ctx.guild.remove_ban(int(id))
-    embed = interactions.Embed(title=f'User {client.fetch_user(str(id))} has been unbanned successfully.')
+    embed = interactions.Embed(title=f'User {client.fetch_user(int(id))} has been unbanned successfully.')
     embed.set_footer(text=f'Action by {ctx.author} | {ctx.author.id}')
     await ctx.send(embeds=embed)
 # end of commands #

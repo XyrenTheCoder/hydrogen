@@ -4,14 +4,14 @@ from discord.ext.commands import *
 from keep_alive import keep_alive
 
 oid = ['705462972415213588', '706697300872921088']
-client = commands.Bot(command_prefix='.', intents=discord.Intents.all())
-# command prefix remains unused, all commands are slash commands currently
 with open('token.txt', 'r') as f: token = f.readline()
 bot = interactions.Client(token=token)
+client = commands.Bot(command_prefix='.', intents=discord.Intents.all())
+# command prefix remains unused, all commands are slash commands currently
 # note: 'client' for discord.py related code, 'bot' for interactions.py related code
 
 @bot.event
-async def on_ready():
+async def on_start():
     os.system('cls') if os.name == 'nt' else 'clear'
     print('Reminder: remember to run /load errorHandler to enable error handler as cogs are not preloaded.')
 
@@ -114,12 +114,10 @@ async def _1(ctx: interactions.CommandContext, command=None):
     elif command == 'ban':
         embed.add_field(name='Command name: ban', value="Description: Ban a member from server\nUsage: `/ban <member: user> <reason: reason>`", inline=False)
         embed.set_footer(text='The ban hammer has spoken.')
-    elif command == 'unban':
-        embed.add_field(name='Command name: unban', value="Description: Unban a member from server\nUsage: `/unban <id: user id>", inline=False)
-        embed.set_footer(text='The ban hammer has shut up.')
+
     else:
         embed.add_field(name='General:', value="help, ping", inline=False)
-        embed.add_field(name='Moderation:', value="kick, ban, unban", inline=False)
+        embed.add_field(name='Moderation:', value="kick, ban", inline=False)
         embed.add_field(name='Administration:', value="load, unload, reload", inline=False)
         embed.set_footer(text='Specify a command to get further information.')
     await ctx.send(embeds=embed, ephemeral=True)
@@ -173,22 +171,39 @@ async def _3(ctx: interactions.CommandContext, member: interactions.Member, *, r
     embed.set_footer(text=f'Action by {ctx.author} | {ctx.author.id}')
     await ctx.send(embeds=embed)
 
-@bot.command(name='unban', description='Unban a user', options=[
+'''
+@bot.command(name='mute', description='Mute a user', options=[
     interactions.Option(
-        name='id',
-        description='Target user\'s id',
-        type=interactions.OptionType.NUMBER,
+        name='member',
+        description='Target user',
+        type=interactions.OptionType.USER,
         required=True
+    ),
+    interactions.Option(
+        name='reason',
+        description='Reason of mute',
+        type=interactions.OptionType.STRING,
+        required=False
     )
 ])
-@commands.has_permissions(ban_members=True)
+@commands.has_permissions(mute_members=True)
 @commands.cooldown(1, 5, commands.BucketType.user)
 @commands.guild_only()
-async def _4(ctx: interactions.CommandContext, id: str):
-    await ctx.guild.remove_ban(int(id))
-    embed = interactions.Embed(title=f'User {client.fetch_user(int(id))} has been unbanned successfully.')
+async def _4(ctx: interactions.CommandContext, member: interactions.Member, reason=None):
+    all = await interactions.Guild.get_all_roles(self=interactions.Guild())
+    if 'Mute' in all: role = discord.utils.get(all, name='Muted')
+    else:
+        role = await ctx.guild.create_role(name="Muted")
+        for channel in ctx.guild.channels: await channel.set_permissions(role, speak=False, send_messages=False, read_message_history=True, read_messages=False)
+    embed = interactions.Embed(title=f"User {member.mention} was muted successfully.")
+    if reason == None: embed.add_field(name='Reason:', value='Not provided')
+    else: embed.add_field(name="Reason:", value=reason, inline=False)
     embed.set_footer(text=f'Action by {ctx.author} | {ctx.author.id}')
     await ctx.send(embeds=embed)
+    await member.add_role(role, int(ctx.guild_id), reason=reason)
+    await member.send(f"You have been muted from: {ctx.guild.name}\nreason: {reason}")
+'''
+
 # end of commands #
 
 if __name__ != __file__: keep_alive(); bot.start()

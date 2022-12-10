@@ -114,13 +114,12 @@ async def _1(ctx: interactions.CommandContext, command=None):
     elif command == 'ban':
         embed.add_field(name='Command name: ban', value="Description: Ban a member from server\nUsage: `/ban <member: user> <reason: reason>`", inline=False)
         embed.set_footer(text='The ban hammer has spoken.')
-    elif command == 'factorial':
-        embed.add_field(name='Command name: factorial', value="Description: Evaluate factorial of a number\nUsage: `/factorial <n: float>`", inline=False)
+    elif command == 'calculator':
+        embed.add_field(name='Command name: calculator', value="Description: Open complex calculator\nUsage: `/calculator`", inline=False)
         embed.set_footer(text='1 1 2 6 24 120 720 5040 40320...')
     else:
-        embed.add_field(name='General:', value="help, ping", inline=False)
+        embed.add_field(name='General:', value="help, ping, calculator", inline=False)
         embed.add_field(name='Moderation (Server moderating permission required):', value="kick, ban", inline=False)
-        embed.add_field(name='Mathematics (Yoooo math commands are back):', value="factorial", inline=False)
         embed.add_field(name='Administration (Bot owner commands):', value="load, unload, reload", inline=False)
         embed.set_footer(text='Specify a command to get further information.')
     await ctx.send(embeds=embed, ephemeral=True)
@@ -174,27 +173,10 @@ async def _3(ctx: interactions.CommandContext, member: interactions.Member, *, r
     embed.set_footer(text=f'Action by {ctx.author} | {ctx.author.id}')
     await ctx.send(embeds=embed)
 
-@bot.command(name='factorial', description='Evaluate factorial of a number', options=[
-    interactions.Option(
-        name='n',
-        description='Value of n in n!',
-        type=interactions.OptionType.NUMBER,
-        required=True
-    )
-])
-@commands.has_permissions(mute_members=True)
-@commands.cooldown(1, 5, commands.BucketType.user)
-@commands.guild_only()
-async def _4(ctx: interactions.CommandContext, n: float):
-    try:
-        embed = interactions.Embed(title=f'{n}!')
-        embed.add_field(name='----------', value=f'**= {math.gamma(n + 1)}**')
-        await ctx.send(embeds=embed)
-    except OverflowError: await ctx.send(f'Input "{n}" too big.\n Please enter a smaller number')
-
 ### start of calculator cmd ###
 e = cmath.e
 pi = cmath.pi
+ans = float()
 def sqrt(x): return cmath.sqrt(x)
 def fact(x): return math.gamma(x + 1)
 def log(x, y): return cmath.log(x, y)
@@ -212,8 +194,43 @@ def tan(x): return cmath.tan(x)
 def tanh(x): return cmath.tanh(x)
 def arctan(x): return cmath.atan(x)
 def arctanh(x): return cmath.atanh(x)
+def sum(*args): return eval(' + '.join([str(value) for value in args]))
+def sd(*args): # standard deviation population
+    mean = eval(' + '.join([str(value) for value in args])) / len(args)
+    g = []
+    for i in args: groups = (i - mean) ** 2; g.append(groups)
+    sd = sqrt(eval(' + '.join([str(value) for value in args])) / len(args) - 1)
+    return sd
+def sx(*args): # standard deviation sample
+    mean = eval(' + '.join([str(value) for value in args])) / len(args)
+    g = []
+    for i in args: groups = (i - mean) ** 2; g.append(groups)
+    sx = sqrt(eval(' + '.join([str(value) for value in args])) / len(args))
+    return sx
+def ss(data: float, mean: float, sd: float):
+    z = (data - mean) / sd
+    return z
 
 button0 = [
+    interactions.ActionRow(
+        components=[
+            interactions.Button(
+                style=interactions.ButtonStyle.SUCCESS,
+                label="shift",
+                custom_id="inv"
+            ),
+            interactions.Button(
+                style=interactions.ButtonStyle.SUCCESS,
+                label="mode",
+                custom_id="mode"
+            ),
+            interactions.Button(
+                style=interactions.ButtonStyle.SUCCESS,
+                label="hyp",
+                custom_id="hyp"
+            ),
+        ]
+    ),
     interactions.ActionRow(
         components=[
             interactions.Button(
@@ -232,14 +249,14 @@ button0 = [
                 custom_id="9"
             ),
             interactions.Button(
-                style=interactions.ButtonStyle.PRIMARY,
-                label="(",
-                custom_id="oparen"
+                style=interactions.ButtonStyle.DANGER,
+                label="DEL",
+                custom_id="backspace"
             ),
             interactions.Button(
-                style=interactions.ButtonStyle.PRIMARY,
-                label=")",
-                custom_id="cparen"
+                style=interactions.ButtonStyle.DANGER,
+                label="AC",
+                custom_id="clearall"
             )
         ]
     ),
@@ -262,13 +279,13 @@ button0 = [
             ),
             interactions.Button(
                 style=interactions.ButtonStyle.PRIMARY,
-                label="n!",
-                custom_id="factorial"
+                label="×",
+                custom_id="multiply"
             ),
             interactions.Button(
                 style=interactions.ButtonStyle.PRIMARY,
-                label="log",
-                custom_id="log"
+                label="÷",
+                custom_id="divide"
             )
         ]
     ),
@@ -291,13 +308,13 @@ button0 = [
             ),
             interactions.Button(
                 style=interactions.ButtonStyle.PRIMARY,
-                label=",",
-                custom_id="comma"
+                label="+",
+                custom_id="plus"
             ),
             interactions.Button(
                 style=interactions.ButtonStyle.PRIMARY,
-                label="√",
-                custom_id="sqrt"
+                label="-",
+                custom_id="minus"
             )
         ]
     ),
@@ -314,48 +331,19 @@ button0 = [
                 custom_id="dot"
             ),
             interactions.Button(
-                style=interactions.ButtonStyle.SUCCESS,
-                label="+/-",
-                custom_id="sign"
+                style=interactions.ButtonStyle.PRIMARY,
+                label="EXP",
+                custom_id="exp"
             ),
             interactions.Button(
                 style=interactions.ButtonStyle.PRIMARY,
-                label="%",
-                custom_id="percent"
+                label="ANS",
+                custom_id="answer"
             ),
             interactions.Button(
                 style=interactions.ButtonStyle.SUCCESS,
                 label="=",
                 custom_id="equal"
-            )
-        ]
-    ),
-    interactions.ActionRow(
-        components=[
-            interactions.Button(
-                style=interactions.ButtonStyle.PRIMARY,
-                label="+",
-                custom_id="plus"
-            ),
-            interactions.Button(
-                style=interactions.ButtonStyle.PRIMARY,
-                label="-",
-                custom_id="minus"
-            ),
-            interactions.Button(
-                style=interactions.ButtonStyle.PRIMARY,
-                label="×",
-                custom_id="multiply"
-            ),
-            interactions.Button(
-                style=interactions.ButtonStyle.PRIMARY,
-                label="÷",
-                custom_id="divide"
-            ),
-            interactions.Button(
-                style=interactions.ButtonStyle.PRIMARY,
-                label="aᵇ",
-                custom_id="power"
             )
         ]
     )
@@ -364,15 +352,34 @@ button1 = [
     interactions.ActionRow(
         components=[
             interactions.Button(
-                style=interactions.ButtonStyle.SUCCESS,
-                label="hyp",
-                custom_id="hyp"
+                style=interactions.ButtonStyle.PRIMARY,
+                label="√",
+                custom_id="sqrt"
             ),
             interactions.Button(
-                style=interactions.ButtonStyle.SUCCESS,
-                label="arc/inv",
-                custom_id="inv"
+                style=interactions.ButtonStyle.PRIMARY,
+                label="aᵇ",
+                custom_id="power"
             ),
+            interactions.Button(
+                style=interactions.ButtonStyle.PRIMARY,
+                label="log",
+                custom_id="log"
+            ),
+            interactions.Button(
+                style=interactions.ButtonStyle.SECONDARY,
+                label="(",
+                custom_id="oparen"
+            ),
+            interactions.Button(
+                style=interactions.ButtonStyle.SECONDARY,
+                label=")",
+                custom_id="cparen"
+            )
+        ]
+    ),
+    interactions.ActionRow(
+        components=[
             interactions.Button(
                 style=interactions.ButtonStyle.PRIMARY,
                 label="sin",
@@ -387,49 +394,81 @@ button1 = [
                 style=interactions.ButtonStyle.PRIMARY,
                 label="tan",
                 custom_id="tan"
+            ),
+            interactions.Button(
+                style=interactions.ButtonStyle.SECONDARY,
+                label="e",
+                custom_id="e"
+            ),
+            interactions.Button(
+                style=interactions.ButtonStyle.SECONDARY,
+                label="π",
+                custom_id="pi"
             )
         ]
     ),
     interactions.ActionRow(
         components=[
             interactions.Button(
-                style=interactions.ButtonStyle.PRIMARY,
-                label="e",
-                custom_id="e"
+                style=interactions.ButtonStyle.SUCCESS,
+                label="+/-",
+                custom_id="sign"
+            ),
+            interactions.Button(
+                style=interactions.ButtonStyle.SECONDARY,
+                label="|x|",
+                custom_id="abs"
             ),
             interactions.Button(
                 style=interactions.ButtonStyle.PRIMARY,
-                label="pi",
-                custom_id="pi"
+                label="%",
+                custom_id="percent"
             ),
             interactions.Button(
                 style=interactions.ButtonStyle.PRIMARY,
-                label="nPr",
-                custom_id="npr"
+                label="n!",
+                custom_id="factorial"
             ),
             interactions.Button(
-                style=interactions.ButtonStyle.PRIMARY,
-                label="nCr",
-                custom_id="ncr"
-            ),
+                style=interactions.ButtonStyle.SECONDARY,
+                label=",",
+                custom_id="comma"
+            )
         ]
     ),
     interactions.ActionRow(
         components=[
             interactions.Button(
-                style=interactions.ButtonStyle.DANGER,
-                label="AC",
-                custom_id="clearall"
+                style=interactions.ButtonStyle.SUCCESS,
+                label="nPr",
+                custom_id="npr"
             ),
             interactions.Button(
-                style=interactions.ButtonStyle.DANGER,
-                label="BS",
-                custom_id="backspace"
+                style=interactions.ButtonStyle.SUCCESS,
+                label="nCr",
+                custom_id="ncr"
+            ),
+            interactions.Button(
+                style=interactions.ButtonStyle.PRIMARY,
+                label="Σx",
+                custom_id="sum"
+            ),
+            interactions.Button(
+                style=interactions.ButtonStyle.PRIMARY,
+                label="σ/s",
+                custom_id="sd"
+            ),
+            interactions.Button(
+                style=interactions.ButtonStyle.PRIMARY,
+                label="z",
+                custom_id="ss"
             )
         ]
     )
 ]
 row = []
+history = []
+async def getans(): global ans; ans = history[-1]; print(ans); return ans
 async def chyp(c: bool): global hyperbolic; hyperbolic = c
 async def carc(d: bool): global inverse; inverse = d
 async def display(a, arg):
@@ -438,6 +477,9 @@ async def display(a, arg):
 async def final(a, arg):
     #embed = interactions.Embed(title=arg)
     await a.edit(str(arg), components=button0)
+    await gethistory(arg)
+async def gethistory(arg): history.append(arg)
+
 @bot.command(name='calculator', description='Summon calculator')
 async def _5(ctx: interactions.CommandContext):
     #embed = interactions.Embed(title='h')
@@ -504,7 +546,8 @@ async def _sign(ctx: interactions.ComponentContext): row.append('-'); await disp
 @bot.component("hyp")
 async def _hyperbolic(ctx: interactions.ComponentContext): await chyp(True); await ctx.send('[Hyperbolic enabled]', ephemeral=True)
 @bot.component("inv")
-async def _inverse(ctx: interactions.ComponentContext): await carc(True); await ctx.send('[Inverse enabled]', ephemeral=True)
+async def _shift(ctx: interactions.ComponentContext):
+    await carc(True); await ctx.send('[Shift enabled]', ephemeral=True)
 @bot.component("sin")
 async def _sine(ctx: interactions.ComponentContext):
     global hyperbolic, inverse
@@ -532,8 +575,26 @@ async def _tangent(ctx: interactions.ComponentContext):
     else: row.append('tan(')
     await display(a, row)
     await chyp(False); await carc(False)
+@bot.component("sum")
+async def _sum(ctx: interactions.ComponentContext): row.append('sum('); await display(a, row)
+@bot.component("sd")
+async def _sd(ctx: interactions.ComponentContext):
+    global inverse
+    if inverse: row.append('sx(')
+    else: row.append('sd(')
+    await display(a, row); await carc(False)
+@bot.component("ss")
+async def _ss(ctx: interactions.ComponentContext): row.append('ss('); await display(a, row)
+@bot.component("exp")
+async def _exp(ctx: interactions.ComponentContext): row.append(' * (10 ** '); await display(a, row)
+@bot.component("abs")
+async def _abs(ctx: interactions.ComponentContext): row.append('abs('); await display(a, row)
+@bot.component("answer")
+async def _answer(ctx: interactions.ComponentContext):
+    global ans; ans = await getans()
+    row.append('ans'); await display(a, row); return ans
 @bot.component("equal")
-async def _equal(ctx: interactions.ComponentContext): f = ''.join(row); await final(a, eval(f)); row.clear()
+async def _equal(ctx: interactions.ComponentContext): await final(a, eval(''.join(row))); row.clear()
 @bot.component("clearall")
 async def _clearall(ctx: interactions.ComponentContext): row.clear(); await display(a, row)
 @bot.component("backspace")
